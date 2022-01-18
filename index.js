@@ -26,7 +26,7 @@ app.use(express.static("public"));
 
 
 // MONGODB
-mongoose.connect(`mongodb://127.0.0.1:27017/users?directConnection=true&serverSelectionTimeoutMS=2000`, { useNewUrlParser: true });
+mongoose.connect(`mongodb://127.0.0.1:27017/fleetdb?directConnection=true&serverSelectionTimeoutMS=2000`, { useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema({
     user: String,
@@ -35,4 +35,44 @@ const userSchema = new mongoose.Schema({
     fleets: []
 })
 
+//  USE Passport mongoose
+userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate)
+const user = new mongoose.model("User",userSchema)
+passport.user(User.createStrategy())
+passport.serializeUser((user,done)=>{
+    done(null,user.id);
+})
 
+passport.deserializeUser((id,done)=>{
+    User.findById(id,(err,user)=>{
+        done(err,user)
+    })
+})
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "https://localhost:3000/auth/google/fleets",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+},
+(accessToken,refreshToken, profile, cb){
+    User.findorCreate({googleId: profile.id},(err,user)=>{
+        return cb(err,user)''
+    })
+}
+
+
+))
+
+
+
+
+
+app.route("/").get((req,res)=>{
+    res.render("home")
+})
+
+app.listen(3000,()=>{
+    console.log("hello mr server")
+})
