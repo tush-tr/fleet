@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+
+<div class="jumbotron text-center">
+  <div class="container">
+    
+    <h1 class="display-3">Your Fleets are here</h1>
+    <% fleets.forEach((fleet)=>{ %>
+        <div class="fleetcontainer">
+            <p class="fleet-line card-panel"><%= fleet %></p>
+        </div>
+    <% }) %>
+    <hr>
+    
+    <a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
+    <a class="btn btn-dark btn-lg" href="/submit" role="button">Add a fleet</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
